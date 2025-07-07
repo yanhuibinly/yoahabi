@@ -13,5 +13,5 @@ AGENT_LLM_MAP: dict[str, LLMType] = {
     "browser": "vision",  # 浏览器操作使用vision llm
     "reporter": "basic",  # 编写报告使用basic llm
     "file_manager": "basic",  # 本地文件操作使用basic llm
-    "rag": "basic",  # RAG检索使用basic llm
+    "twitter": "basic",  # twitter交互使用basic llm
 }

@@ -16,7 +16,7 @@ As a assistant, you can breakdown the major subject into sub-topics and expand t
 - **`{{agent}}`**: {{ TEAM_MEMBER_CONFIGRATIONS[agent]["desc_for_llm"] }}
 {% endfor %}
 
-**Note**: Ensure that each step using `coder` and `browser` completes a full task, as session continuity cannot be preserved.
+**Note**: If it is not mentioned, please do not use the `browser` casually.
 
 ## Execution Rules
 

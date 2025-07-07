@@ -7,11 +7,12 @@ from src.tools import (
     crawl_tool,
     python_repl_tool,
     tavily_tool,
-    graph_retrieve,
+    graph_retriever,
 )
 
 from src.llms.llm import get_llm_by_type
 from src.config.agents import AGENT_LLM_MAP
+from src.tools.twitter_tools import get_twitter_tools
 
 
 # Create agents using configured LLM types
@@ -25,7 +26,7 @@ def create_agent(agent_type: str, tools: list, prompt_template: str):
 
 
 # Create agents using the factory function
-research_agent = create_agent("researcher", [tavily_tool, crawl_tool], "researcher")
+research_agent = create_agent("researcher", [graph_retriever, tavily_tool], "researcher")
 coder_agent = create_agent("coder", [python_repl_tool, bash_tool], "coder")
 browser_agent = create_agent("browser", [browser_tool], "browser")
-rag_agent = create_agent("rag", [graph_retrieve], "rag")
+twitter_agent = create_agent("twitter", get_twitter_tools(), "twitter")

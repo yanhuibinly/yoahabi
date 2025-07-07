@@ -61,17 +61,14 @@ TEAM_MEMBER_CONFIGRATIONS = {
         "desc_for_llm": "Write a professional report based on the result of each step.",
         "is_optional": False,
     },
-    "rag": {
-        "name": "rag",
+    "twitter": {
+        "name": "twitter",
         "desc": (
-             "Responsible for retrieving information using RAG (Retrieval-Augmented Generation) technology"
-         ),
-         "desc_for_llm": (
-             "Uses RAG to query and retrieve relevant information from various knowledge sources including documents, knowledge graphs, and vector databases. "
-             "Provides comprehensive answers based on retrieved context and semantic search capabilities."
-         ),
-        "is_optional": True,
-    },
+            "Responsible for twitter or x platform data."
+        ),
+        "desc_for_llm": "Get data from Twitter or X platform for data analysis.",
+        "is_optional": False,
+    }
 }
 
 TEAM_MEMBERS = list(TEAM_MEMBER_CONFIGRATIONS.keys())

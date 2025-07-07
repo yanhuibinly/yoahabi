@@ -18,7 +18,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "socksio>=1.0.0",
     "markdownify>=1.1.0",
-    "browser-use>=0.1.0",
+    "browser-use<=0.3.2",
     "playwright>=1.47.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.27.1",
@@ -33,6 +33,7 @@ dependencies = [
     "mcp>=1.5.0",
     "langchain-mcp-adapters>=0.0.3",
     "graphrag>=2.1.0",
+    "x-twitter-mcp>=0.1.1",
 ]
 
 [project.optional-dependencies]

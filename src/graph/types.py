@@ -20,7 +20,6 @@ class State(MessagesState):
     # Constants
     TEAM_MEMBERS: list[str]
     TEAM_MEMBER_CONFIGRATIONS: dict[str, dict]
-    MCP_TOOLS: list[any]
 
     # Runtime Variables
     next: str

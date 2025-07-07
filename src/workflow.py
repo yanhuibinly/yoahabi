@@ -1,7 +1,6 @@
 import logging
 from .config import TEAM_MEMBER_CONFIGRATIONS, TEAM_MEMBERS
 from .graph import build_graph
-from langchain_mcp_adapters.client import MultiServerMCPClient
 
 # Configure logging
 logging.basicConfig(
@@ -19,25 +18,6 @@ logger = logging.getLogger(__name__)
 
 # Create the graph
 graph = build_graph()
-
-
-async def init_mcp_tools():
-    client = MultiServerMCPClient(
-        {
-            "filesystem": {
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@modelcontextprotocol/server-filesystem",
-                    "/Users/yanhuibin/myData",
-                    "/Users/yanhuibin/myData",
-                ],
-                "transport": "stdio",
-            }
-        }
-    )
-    tools = await client.get_tools()
-    return tools
 
 
 def run_agent_workflow(user_input: str, debug: bool = False):
@@ -58,17 +38,6 @@ def run_agent_workflow(user_input: str, debug: bool = False):
 
     logger.info(f"Starting workflow with user input: {user_input}")
 
-    # 初始化 MCP 工具
-    import asyncio
-    try:
-        # 尝试获取当前事件循环
-        loop = asyncio.get_running_loop()
-        # 如果已经有事件循环在运行，使用create_task
-        MCP_TOOLS = []  # 暂时设为空，避免循环嵌套问题
-    except RuntimeError:
-        # 没有运行的事件循环，可以使用asyncio.run
-        MCP_TOOLS = asyncio.run(init_mcp_tools())
-
     result = graph.invoke(
         {
             # Constants
@@ -78,7 +47,6 @@ def run_agent_workflow(user_input: str, debug: bool = False):
             "messages": [{"role": "user", "content": user_input}],
             "deep_thinking_mode": False,
             "search_before_planning": False,
-            # "MCP_TOOLS": MCP_TOOLS,
         },
         config={"configurable": {"thread_id": "default_thread"}}
     )

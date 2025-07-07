@@ -7,14 +7,14 @@ from typing import Literal
 from langchain_core.messages import HumanMessage, BaseMessage
 from src.agents.agents import create_agent
 from src.tools.file_management import write_file_tool
-from src.tools.graph_rag import graph_retrieve
 from src.tools.human_feedback import human_feedback_tool
+from src.agents import research_agent, coder_agent, browser_agent, twitter_agent
+
 
 import json_repair
 from langchain_core.messages import HumanMessage
 from langgraph.types import Command
 
-from src.agents import research_agent, coder_agent, browser_agent, rag_agent
 from src.llms.llm import get_llm_by_type
 from src.config import TEAM_MEMBERS
 from src.config.agents import AGENT_LLM_MAP
@@ -23,10 +23,10 @@ from src.tools.search import tavily_tool
 from src.utils.json_utils import repair_json_output
 from .types import State, Router
 
+
 logger = logging.getLogger(__name__)
 
 RESPONSE_FORMAT = "Response from {}:\n\n<response>\n{}\n</response>\n\n*Please execute the next step.*"
-
 
 def research_node(state: State) -> Command[Literal["supervisor"]]:
     """Node for the researcher agent that performs research tasks."""
@@ -71,7 +71,6 @@ def code_node(state: State) -> Command[Literal["supervisor"]]:
         goto="supervisor",
     )
 
-
 def browser_node(state: State) -> Command[Literal["supervisor"]]:
     """Node for the browser agent that performs web browsing tasks."""
     logger.info("Browser agent starting task")
@@ -87,6 +86,27 @@ def browser_node(state: State) -> Command[Literal["supervisor"]]:
                 HumanMessage(
                     content=response_content,
                     name="browser",
+                )
+            ]
+        },
+        goto="supervisor",
+    )
+
+def twitter_node(state: State) -> Command[Literal["supervisor"]]:
+    """Node for the twitter agent that performs web browsing tasks."""
+    logger.info("Twitter agent starting task")
+    result = twitter_agent.invoke(state)
+    logger.info("Twitter agent completed task")
+    response_content = result["messages"][-1].content
+    # 尝试修复可能的JSON输出
+    response_content = repair_json_output(response_content)
+    logger.debug(f"Twitter agent response: {response_content}")
+    return Command(
+        update={
+            "messages": [
+                HumanMessage(
+                    content=response_content,
+                    name="twitter",
                 )
             ]
         },
@@ -126,9 +146,11 @@ def planner_node(state: State) -> Command[Literal["supervisor", "__end__"]]:
     logger.info("Planner generating full plan")
     messages = apply_prompt_template("planner", state)
     # whether to enable deep thinking mode
-    llm = get_llm_by_type("basic")
     if state.get("deep_thinking_mode"):
         llm = get_llm_by_type("reasoning")
+    else:
+        llm = get_llm_by_type("basic")
+
     if state.get("search_before_planning"):
         searched_content = tavily_tool.invoke({"query": state["messages"][-1].content})
         if isinstance(searched_content, list):
@@ -229,32 +251,5 @@ def save_file_node(state: State) -> Command[Literal["supervisor"]]:
         goto="supervisor",
     )
 
-
-def rag_node(state: State) -> Command[Literal["supervisor"]]:
-    """RAG node that performs knowledge retrieval using RAG technology."""
-    logger.info("RAG agent starting task")
-    result = rag_agent.invoke(state)
-    logger.info("RAG agent completed task")
-    response_content = result["messages"][-1].content
-    # 尝试修复可能的JSON输出
-    response_content = repair_json_output(response_content)
-    logger.debug(f"RAG agent response: {response_content}")
-    return Command(
-        update={
-            "messages": [
-                HumanMessage(
-                    content=response_content,
-                    name="rag",
-                )
-            ]
-        },
-        goto="supervisor",
-    )
-
-def test_node(state: State) -> Command[Literal["__end__"]]:
-    return Command(
-        update={},
-        goto="__end__",
-    )
 
 
